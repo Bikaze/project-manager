@@ -32,6 +32,7 @@ import {
 import { Bell, Palette, Shield, User, Trash2, UserCheck } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 const SettingsPage = () => {
   const {
@@ -116,17 +117,25 @@ const SettingsPage = () => {
   const handleDeleteWorkspace = async () => {
     if (!selectedWorkspace?._id) return;
 
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this workspace? This action will permanently delete all projects, tasks, and data. This cannot be undone."
+    // Double confirmation to prevent accidental deletion
+    const firstConfirm = window.confirm(
+      "Are you sure you want to delete this workspace? This is a permanent action."
     );
 
-    if (confirmDelete) {
-      try {
-        await deleteWorkspaceMutation.mutateAsync(selectedWorkspace._id);
-        navigate("/dashboard");
-        alert("Workspace deleted successfully!");
-      } catch (error) {
-        alert("Failed to delete workspace");
+    if (firstConfirm) {
+      const finalConfirm = window.confirm(
+        `Please confirm again: This will permanently delete the workspace "${selectedWorkspace.name}" and all its data including projects, tasks, and member relationships. This action CANNOT be undone.`
+      );
+
+      if (finalConfirm) {
+        try {
+          await deleteWorkspaceMutation.mutateAsync(selectedWorkspace._id);
+          toast.success("Workspace deleted successfully");
+          navigate("/dashboard", { replace: true });
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || "Failed to delete workspace");
+          console.error("Workspace deletion error:", error);
+        }
       }
     }
   };

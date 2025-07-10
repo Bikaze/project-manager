@@ -29,10 +29,27 @@ export const getTaskStatusColor = (status: ProjectStatus) => {
 
 export const getProjectProgress = (tasks: { status: TaskStatus }[]) => {
   const totalTasks = tasks.length;
+  if (totalTasks === 0) return 0;
 
-  const completedTasks = tasks.filter((task) => task?.status === "Done").length;
+  const weightedProgress = tasks.reduce((acc, task) => {
+    switch (task.status) {
+      case "Done":
+        return acc + 100;
+      case "In Progress":
+        return acc + 50;
+      case "To Do":
+        return acc + 0;
+      default:
+        return acc;
+    }
+  }, 0);
 
-  const progress =
-    totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-  return progress;
+  return Math.round(weightedProgress / totalTasks);
+};
+
+export const getProgressColor = (progress: number) => {
+  if (progress >= 75) return "bg-green-600";
+  if (progress >= 50) return "bg-blue-600";
+  if (progress >= 25) return "bg-yellow-600";
+  return "bg-gray-600";
 };

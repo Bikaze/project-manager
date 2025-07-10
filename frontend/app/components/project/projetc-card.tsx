@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { cn } from "@/lib/utils";
-import { getTaskStatusColor } from "@/lib";
+import { getTaskStatusColor, getProgressColor } from "@/lib";
 import { Progress } from "../ui/progress";
 import { format } from "date-fns";
 import { CalendarDays } from "lucide-react";
@@ -51,7 +51,10 @@ export const ProjectCard = ({
                 <span>{progress}%</span>
               </div>
 
-              <Progress value={progress} className="h-2" />
+              <Progress
+                value={progress}
+                className={cn("h-2", progress > 0 && getProgressColor(progress))}
+              />
             </div>
 
             <div className="flex items-center justify-between">

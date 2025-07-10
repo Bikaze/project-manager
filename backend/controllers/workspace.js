@@ -5,6 +5,7 @@ import WorkspaceInvite from "../models/workspace-invite.js";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../libs/send-email.js";
 import { recordActivity } from "../libs/index.js";
+import mongoose from "mongoose";
 
 const createWorkspace = async (req, res) => {
   try {
@@ -687,25 +688,38 @@ const deleteWorkspace = async (req, res) => {
       });
     }
 
-    // Delete all associated projects and tasks
-    await Project.deleteMany({ workspace: workspaceId });
+    // Start a cleanup transaction
+    const session = await mongoose.startSession();
+    try {
+      await session.withTransaction(async () => {
+        // Delete all associated data in order
+        const Task = (await import("../models/task.js")).default;
+        
+        // Delete comments and activity logs first
+        await Promise.all([
+          Task.deleteMany({ workspace: workspaceId }).session(session),
+          Project.deleteMany({ workspace: workspaceId }).session(session),
+          WorkspaceInvite.deleteMany({ workspaceId: workspaceId }).session(session)
+        ]);
 
-    const Task = (await import("../models/task.js")).default;
-    await Task.deleteMany({ workspace: workspaceId });
-
-    // Delete workspace invites
-    await WorkspaceInvite.deleteMany({ workspace: workspaceId });
-
-    // Delete the workspace
-    await Workspace.findByIdAndDelete(workspaceId);
-
-    res.status(200).json({
-      message: "Workspace deleted successfully",
-    });
+        // Finally delete the workspace
+        await Workspace.findByIdAndDelete(workspaceId).session(session);
+      });
+      
+      await session.endSession();
+      
+      res.status(200).json({
+        message: "Workspace deleted successfully",
+      });
+    } catch (error) {
+      await session.abortTransaction();
+      await session.endSession();
+      throw error;
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      message: "Internal server error",
+      message: "Failed to delete workspace. Please try again later.",
     });
   }
 };
