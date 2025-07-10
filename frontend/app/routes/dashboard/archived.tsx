@@ -10,28 +10,33 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGetWorkspaceArchivedProjectsQuery, useGetWorkspaceArchivedTasksQuery } from "@/hooks/use-workspace";
+import {
+  useGetWorkspaceArchivedProjectsQuery,
+  useGetWorkspaceArchivedTasksQuery,
+} from "@/hooks/use-workspace";
 import { useWorkspace } from "@/provider/workspace-context";
 import type { Project, Task } from "@/types";
 import { format } from "date-fns";
 import { Archive, Calendar, Folder, ListCheck } from "lucide-react";
 
 const ArchivedPage = () => {
-  const { selectedWorkspace, hasWorkspaces, isLoading: workspacesLoading } = useWorkspace();
+  const {
+    selectedWorkspace,
+    hasWorkspaces,
+    isLoading: workspacesLoading,
+  } = useWorkspace();
 
-  const { data: archivedProjects, isLoading: projectsLoading } = useGetWorkspaceArchivedProjectsQuery(
-    selectedWorkspace?._id || ""
-  ) as {
-    data: Project[];
-    isLoading: boolean;
-  };
+  const { data: archivedProjects, isLoading: projectsLoading } =
+    useGetWorkspaceArchivedProjectsQuery(selectedWorkspace?._id || "") as {
+      data: Project[];
+      isLoading: boolean;
+    };
 
-  const { data: archivedTasks, isLoading: tasksLoading } = useGetWorkspaceArchivedTasksQuery(
-    selectedWorkspace?._id || ""
-  ) as {
-    data: Task[];
-    isLoading: boolean;
-  };
+  const { data: archivedTasks, isLoading: tasksLoading } =
+    useGetWorkspaceArchivedTasksQuery(selectedWorkspace?._id || "") as {
+      data: Task[];
+      isLoading: boolean;
+    };
 
   if (workspacesLoading || projectsLoading || tasksLoading) {
     return <Loader />;
@@ -81,7 +86,7 @@ const ArchivedPage = () => {
               title="No archived projects"
               description="No projects have been archived yet."
               buttonText="View Projects"
-              buttonAction={() => window.location.href = "/workspaces"}
+              buttonAction={() => (window.location.href = "/workspaces")}
             />
           )}
         </TabsContent>
@@ -98,7 +103,7 @@ const ArchivedPage = () => {
               title="No archived tasks"
               description="No tasks have been archived yet."
               buttonText="View Tasks"
-              buttonAction={() => window.location.href = "/my-tasks"}
+              buttonAction={() => (window.location.href = "/my-tasks")}
             />
           )}
         </TabsContent>

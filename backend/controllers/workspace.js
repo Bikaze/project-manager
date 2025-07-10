@@ -554,7 +554,7 @@ const acceptInviteByToken = async (req, res) => {
 const getWorkspaceArchivedProjects = async (req, res) => {
   try {
     const { workspaceId } = req.params;
-    
+
     const projects = await Project.find({
       workspace: workspaceId,
       isArchived: true,
@@ -574,9 +574,9 @@ const getWorkspaceArchivedProjects = async (req, res) => {
 const getWorkspaceArchivedTasks = async (req, res) => {
   try {
     const { workspaceId } = req.params;
-    
+
     const Task = (await import("../models/task.js")).default;
-    
+
     const tasks = await Task.find({
       workspace: workspaceId,
       isArchived: true,
@@ -607,7 +607,8 @@ const updateWorkspace = async (req, res) => {
 
     if (!workspace) {
       return res.status(404).json({
-        message: "Workspace not found or you don't have permission to update it",
+        message:
+          "Workspace not found or you don't have permission to update it",
       });
     }
 
@@ -688,7 +689,7 @@ const deleteWorkspace = async (req, res) => {
 
     // Delete all associated projects and tasks
     await Project.deleteMany({ workspace: workspaceId });
-    
+
     const Task = (await import("../models/task.js")).default;
     await Task.deleteMany({ workspace: workspaceId });
 

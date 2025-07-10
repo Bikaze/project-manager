@@ -78,8 +78,7 @@ export const useGetWorkspaceArchivedProjectsQuery = (workspaceId: string) => {
 export const useGetWorkspaceArchivedTasksQuery = (workspaceId: string) => {
   return useQuery({
     queryKey: ["workspace", workspaceId, "archived", "tasks"],
-    queryFn: async () =>
-      fetchData(`/workspaces/${workspaceId}/archived/tasks`),
+    queryFn: async () => fetchData(`/workspaces/${workspaceId}/archived/tasks`),
     enabled:
       !!workspaceId && workspaceId !== "null" && workspaceId !== "undefined",
   });
@@ -87,15 +86,26 @@ export const useGetWorkspaceArchivedTasksQuery = (workspaceId: string) => {
 
 export const useUpdateWorkspaceMutation = () => {
   return useMutation({
-    mutationFn: async (data: { workspaceId: string; name: string; description: string; color: string }) =>
-      postData(`/workspaces/${data.workspaceId}`, { name: data.name, description: data.description, color: data.color }),
+    mutationFn: async (data: {
+      workspaceId: string;
+      name: string;
+      description: string;
+      color: string;
+    }) =>
+      postData(`/workspaces/${data.workspaceId}`, {
+        name: data.name,
+        description: data.description,
+        color: data.color,
+      }),
   });
 };
 
 export const useTransferWorkspaceOwnershipMutation = () => {
   return useMutation({
     mutationFn: async (data: { workspaceId: string; newOwnerId: string }) =>
-      postData(`/workspaces/${data.workspaceId}/transfer-ownership`, { newOwnerId: data.newOwnerId }),
+      postData(`/workspaces/${data.workspaceId}/transfer-ownership`, {
+        newOwnerId: data.newOwnerId,
+      }),
   });
 };
 
@@ -103,14 +113,14 @@ export const useDeleteWorkspaceMutation = () => {
   return useMutation({
     mutationFn: async (workspaceId: string) =>
       fetch(`${import.meta.env.VITE_API_URL}/workspaces/${workspaceId}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }).then((res) => {
         if (!res.ok) {
-          throw new Error('Failed to delete workspace');
+          throw new Error("Failed to delete workspace");
         }
         return res.json();
       }),

@@ -22,7 +22,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useWorkspace } from "@/provider/workspace-context";
 import { useAuth } from "@/provider/auth-context";
-import { 
+import {
   useGetWorkspaceDetailsQuery,
   useGetWorkspaceMembersQuery,
   useUpdateWorkspaceMutation,
@@ -34,7 +34,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 
 const SettingsPage = () => {
-  const { selectedWorkspace, hasWorkspaces, isLoading: workspacesLoading } = useWorkspace();
+  const {
+    selectedWorkspace,
+    hasWorkspaces,
+    isLoading: workspacesLoading,
+  } = useWorkspace();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -47,8 +51,13 @@ const SettingsPage = () => {
   const [selectedNewOwner, setSelectedNewOwner] = useState("");
 
   // Fetch workspace details and members
-  const { data: workspaceDetails, isLoading: detailsLoading, refetch: refetchDetails } = useGetWorkspaceDetailsQuery(selectedWorkspace?._id || null);
-  const { data: members, isLoading: membersLoading } = useGetWorkspaceMembersQuery(selectedWorkspace?._id || null);
+  const {
+    data: workspaceDetails,
+    isLoading: detailsLoading,
+    refetch: refetchDetails,
+  } = useGetWorkspaceDetailsQuery(selectedWorkspace?._id || null);
+  const { data: members, isLoading: membersLoading } =
+    useGetWorkspaceMembersQuery(selectedWorkspace?._id || null);
 
   // Mutations
   const updateWorkspaceMutation = useUpdateWorkspaceMutation();
@@ -123,9 +132,10 @@ const SettingsPage = () => {
   };
 
   const isOwner = selectedWorkspace?.owner === user?._id;
-  const eligibleNewOwners = members?.filter(
-    (member: any) => member.user._id !== user?._id && member.role !== "owner"
-  ) || [];
+  const eligibleNewOwners =
+    members?.filter(
+      (member: any) => member.user._id !== user?._id && member.role !== "owner"
+    ) || [];
 
   const colorOptions = [
     { value: "#3b82f6", label: "Blue", color: "#3b82f6" },
@@ -220,38 +230,54 @@ const SettingsPage = () => {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="workspace-name">Workspace Name</Label>
-                <Input 
-                  id="workspace-name" 
-                  value={workspaceForm.name} 
-                  onChange={(e) => setWorkspaceForm(prev => ({ ...prev, name: e.target.value }))}
+                <Input
+                  id="workspace-name"
+                  value={workspaceForm.name}
+                  onChange={(e) =>
+                    setWorkspaceForm((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }))
+                  }
                   disabled={!isOwner}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="workspace-description">Description</Label>
-                <Textarea 
-                  id="workspace-description" 
-                  value={workspaceForm.description} 
-                  onChange={(e) => setWorkspaceForm(prev => ({ ...prev, description: e.target.value }))}
+                <Textarea
+                  id="workspace-description"
+                  value={workspaceForm.description}
+                  onChange={(e) =>
+                    setWorkspaceForm((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   disabled={!isOwner}
                   placeholder="Enter workspace description..."
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="workspace-color">Workspace Color</Label>
-                <Select 
-                  value={workspaceForm.color} 
-                  onValueChange={(value: string) => setWorkspaceForm(prev => ({ ...prev, color: value }))}
+                <Select
+                  value={workspaceForm.color}
+                  onValueChange={(value: string) =>
+                    setWorkspaceForm((prev) => ({ ...prev, color: value }))
+                  }
                   disabled={!isOwner}
                 >
                   <SelectTrigger>
                     <SelectValue>
                       <div className="flex items-center gap-2">
-                        <div 
-                          className="w-4 h-4 rounded-full border" 
+                        <div
+                          className="w-4 h-4 rounded-full border"
                           style={{ backgroundColor: workspaceForm.color }}
                         />
-                        {colorOptions.find(c => c.value === workspaceForm.color)?.label}
+                        {
+                          colorOptions.find(
+                            (c) => c.value === workspaceForm.color
+                          )?.label
+                        }
                       </div>
                     </SelectValue>
                   </SelectTrigger>
@@ -259,8 +285,8 @@ const SettingsPage = () => {
                     {colorOptions.map((color) => (
                       <SelectItem key={color.value} value={color.value}>
                         <div className="flex items-center gap-2">
-                          <div 
-                            className="w-4 h-4 rounded-full border" 
+                          <div
+                            className="w-4 h-4 rounded-full border"
                             style={{ backgroundColor: color.color }}
                           />
                           {color.label}
@@ -274,11 +300,13 @@ const SettingsPage = () => {
                 <>
                   <Separator />
                   <div className="flex justify-end">
-                    <Button 
+                    <Button
                       onClick={handleUpdateWorkspace}
                       disabled={updateWorkspaceMutation.isPending}
                     >
-                      {updateWorkspaceMutation.isPending ? "Updating..." : "Save Changes"}
+                      {updateWorkspaceMutation.isPending
+                        ? "Updating..."
+                        : "Save Changes"}
                     </Button>
                   </div>
                 </>
@@ -300,19 +328,26 @@ const SettingsPage = () => {
                     Transfer Ownership
                   </CardTitle>
                   <CardDescription>
-                    Transfer ownership of this workspace to another member. You will become a regular member.
+                    Transfer ownership of this workspace to another member. You
+                    will become a regular member.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="new-owner">Select New Owner</Label>
-                    <Select value={selectedNewOwner} onValueChange={setSelectedNewOwner}>
+                    <Select
+                      value={selectedNewOwner}
+                      onValueChange={setSelectedNewOwner}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Choose a member..." />
                       </SelectTrigger>
                       <SelectContent>
                         {eligibleNewOwners.map((member: any) => (
-                          <SelectItem key={member.user._id} value={member.user._id}>
+                          <SelectItem
+                            key={member.user._id}
+                            value={member.user._id}
+                          >
                             {member.user.name} ({member.user.email})
                           </SelectItem>
                         ))}
@@ -320,12 +355,16 @@ const SettingsPage = () => {
                     </Select>
                   </div>
                   <div className="flex justify-end">
-                    <Button 
+                    <Button
                       onClick={handleTransferOwnership}
-                      disabled={!selectedNewOwner || transferOwnershipMutation.isPending}
+                      disabled={
+                        !selectedNewOwner || transferOwnershipMutation.isPending
+                      }
                       variant="outline"
                     >
-                      {transferOwnershipMutation.isPending ? "Transferring..." : "Transfer Ownership"}
+                      {transferOwnershipMutation.isPending
+                        ? "Transferring..."
+                        : "Transfer Ownership"}
                     </Button>
                   </div>
                 </CardContent>
@@ -338,16 +377,19 @@ const SettingsPage = () => {
                     Danger Zone
                   </CardTitle>
                   <CardDescription>
-                    Permanently delete this workspace and all its data. This action cannot be undone.
+                    Permanently delete this workspace and all its data. This
+                    action cannot be undone.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button 
+                  <Button
                     onClick={handleDeleteWorkspace}
                     disabled={deleteWorkspaceMutation.isPending}
                     variant="destructive"
                   >
-                    {deleteWorkspaceMutation.isPending ? "Deleting..." : "Delete Workspace"}
+                    {deleteWorkspaceMutation.isPending
+                      ? "Deleting..."
+                      : "Delete Workspace"}
                   </Button>
                 </CardContent>
               </Card>
