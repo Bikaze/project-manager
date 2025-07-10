@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/provider/auth-context";
-import type { Workspace } from "@/types";
+import { useWorkspace } from "@/provider/workspace-context";
 import {
-  CheckCircle2,
+  Archive,
   ChevronsLeft,
   ChevronsRight,
   LayoutDashboard,
@@ -18,12 +18,9 @@ import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import { SidebarNav } from "./sidebar-nav";
 
-export const SidebarComponent = ({
-  currentWorkspace,
-}: {
-  currentWorkspace: Workspace | null;
-}) => {
+export const SidebarComponent = () => {
   const { user, logout } = useAuth();
+  const { selectedWorkspace } = useWorkspace();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navItems = [
@@ -48,9 +45,9 @@ export const SidebarComponent = ({
       icon: Users,
     },
     {
-      title: "Achieved",
-      href: `/achieved`,
-      icon: CheckCircle2,
+      title: "Archived",
+      href: `/archived`,
+      icon: Archive,
     },
     {
       title: "Settings",
@@ -72,7 +69,7 @@ export const SidebarComponent = ({
             <div className="flex items-center gap-2">
               <Wrench className="size-6 text-blue-600" />
               <span className="font-semibold text-lg hidden md:block">
-                TaskHuh
+                TaskHub
               </span>
             </div>
           )}
@@ -99,7 +96,7 @@ export const SidebarComponent = ({
           items={navItems}
           isCollapsed={isCollapsed}
           className={cn(isCollapsed && "items-center space-y-2")}
-          currentWorkspace={currentWorkspace}
+          currentWorkspace={selectedWorkspace}
         />
       </ScrollArea>
 

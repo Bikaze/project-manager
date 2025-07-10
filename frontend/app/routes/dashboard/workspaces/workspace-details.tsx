@@ -1,5 +1,6 @@
 import { Loader } from "@/components/loader";
 import { CreateProjectDialog } from "@/components/project/create-project";
+import { WorkspaceNotFound } from "@/components/workspace-not-found";
 import { InviteMemberDialog } from "@/components/workspace/invite-member";
 import { ProjectList } from "@/components/workspace/project-list";
 import { WorkspaceHeader } from "@/components/workspace/workspace-header";
@@ -13,16 +14,17 @@ const WorkspaceDetails = () => {
   const [isCreateProject, setIsCreateProject] = useState(false);
   const [isInviteMember, setIsInviteMember] = useState(false);
 
-  if (!workspaceId) {
-    return <div>No workspace found</div>;
+  if (!workspaceId || workspaceId === "null" || workspaceId === "undefined") {
+    return <WorkspaceNotFound workspaceId={workspaceId} />;
   }
 
-  const { data, isLoading } = useGetWorkspaceQuery(workspaceId) as {
+  const { data, isLoading, error } = useGetWorkspaceQuery(workspaceId) as {
     data: {
       workspace: Workspace;
       projects: Project[];
     };
     isLoading: boolean;
+    error: any;
   };
 
   if (isLoading) {
@@ -31,6 +33,10 @@ const WorkspaceDetails = () => {
         <Loader />
       </div>
     );
+  }
+
+  if (error || !data?.workspace) {
+    return <WorkspaceNotFound workspaceId={workspaceId} />;
   }
 
   return (

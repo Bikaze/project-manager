@@ -1,3 +1,4 @@
+import { EmptyWorkspaceState } from "@/components/empty-workspace-state";
 import { Loader } from "@/components/loader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetMyTasksQuery } from "@/hooks/use-task";
+import { useWorkspace } from "@/provider/workspace-context";
 import type { Task } from "@/types";
 import { format } from "date-fns";
 import { ArrowUpRight, CheckCircle, Clock, FilterIcon } from "lucide-react";
@@ -26,6 +28,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 
 const MyTasks = () => {
+  const { hasWorkspaces, isLoading: workspacesLoading } = useWorkspace();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialFilter = searchParams.get("filter") || "all";
@@ -104,12 +107,23 @@ const MyTasks = () => {
   );
   const doneTasks = sortedTasks.filter((task) => task.status === "Done");
 
-  if (isLoading)
+  if (workspacesLoading || isLoading) {
     return (
       <div>
         <Loader />
       </div>
     );
+  }
+
+  if (!hasWorkspaces) {
+    return (
+      <EmptyWorkspaceState
+        title="No workspaces found"
+        description="You need to create a workspace first before you can view your tasks."
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-start md:items-center justify-between">

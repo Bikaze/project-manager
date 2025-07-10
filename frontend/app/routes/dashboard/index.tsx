@@ -1,9 +1,11 @@
 import { RecentProjects } from "@/components/dashboard/recnt-projects";
 import { StatsCard } from "@/components/dashboard/stat-card";
 import { StatisticsCharts } from "@/components/dashboard/statistics-charts";
+import { EmptyWorkspaceState } from "@/components/empty-workspace-state";
 import { Loader } from "@/components/loader";
 import { UpcomingTasks } from "@/components/upcoming-tasks";
 import { useGetWorkspaceStatsQuery } from "@/hooks/use-workspace";
+import { useWorkspace } from "@/provider/workspace-context";
 import type {
   Project,
   ProjectStatusData,
@@ -13,13 +15,17 @@ import type {
   TaskTrendsData,
   WorkspaceProductivityData,
 } from "@/types";
-import { useSearchParams } from "react-router";
 
 const Dashboard = () => {
-  const [searchParams] = useSearchParams();
-  const workspaceId = searchParams.get("workspaceId");
+  const {
+    selectedWorkspace,
+    hasWorkspaces,
+    isLoading: workspacesLoading,
+  } = useWorkspace();
 
-  const { data, isPending } = useGetWorkspaceStatsQuery(workspaceId!) as {
+  const { data, isPending } = useGetWorkspaceStatsQuery(
+    selectedWorkspace?._id || null
+  ) as {
     data: {
       stats: StatsCardProps;
       taskTrendsData: TaskTrendsData[];
@@ -32,7 +38,19 @@ const Dashboard = () => {
     isPending: boolean;
   };
 
-  if (isPending) {
+  if (workspacesLoading) {
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
+  }
+
+  if (!hasWorkspaces) {
+    return <EmptyWorkspaceState />;
+  }
+
+  if (isPending || !selectedWorkspace) {
     return (
       <div>
         <Loader />
@@ -43,7 +61,12 @@ const Dashboard = () => {
   return (
     <div className="space-y-8 2xl:space-y-12">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <div>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground mt-1">
+            {selectedWorkspace.name} workspace overview
+          </p>
+        </div>
       </div>
 
       <StatsCard data={data.stats} />
